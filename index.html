@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Study Organizer & Timer</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="style.css" />
+        <script src="script.js"></script>
+    </head>
+
+    <body
+        class="bg-gray-100 min-h-screen flex flex-col items-center justify-center"
+    >
+        <!-- Header -->
+        <header
+            class="w-full bg-blue-500 p-4 text-white text-center text-2xl font-bold"
+        >
+            Study Organizer & Timer
+        </header>
+
+        <!-- Main Content -->
+        <main class="w-full max-w-3xl p-4 flex flex-col gap-6 mt-6">
+            <!-- Pomodoro Timer -->
+            <section class="bg-white p-6 shadow-md rounded-2xl">
+                <h2 class="text-xl font-semibold mb-4">Pomodoro Timer</h2>
+                <div
+                    id="timer"
+                    class="text-center text-4xl font-bold mb-4 text-gray-800"
+                >
+                    25:00
+                </div>
+                <div class="flex justify-center gap-4">
+                    <button
+                        id="start"
+                        class="bg-green-500 text-white px-4 py-2 rounded-md"
+                    >
+                        Start
+                    </button>
+                    <button
+                        id="pause"
+                        class="bg-yellow-500 text-white px-4 py-2 rounded-md"
+                    >
+                        Pause
+                    </button>
+                    <button id="reset" class="bg-red-500 text-white px-4 py-2 rounded-md">
+                        Reset
+                    </button>
+                </div>
+            </section>
+            <!-- Gamified Task Tracking -->
+            <section class="bg-white p-6 shadow-md rounded-2xl">
+                <h2 class="text-xl font-semibold mb-4">Task Tracker</h2>
+                <div>
+                    <ul id="task-list" class="list-disc pl-6 text-gray-700 mb-4">
+                        <!-- Dynamic tasks will appear here -->
+                    </ul>
+                    <input
+                        id="task-input"
+                        type="text"
+                        placeholder="New task..."
+                        class="w-full p-2 border rounded-md mb-4"
+                    />
+                    <button
+                        id="add-task"
+                        class="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
+                    >
+                        Add Task
+                    </button>
+                </div>
+                <div id="points" class="text-gray-700 mt-4">Points: 0</div>
+            </section>
+            <!-- Study Plan Generator -->
+            <section class="bg-white p-6 shadow-md rounded-2xl">
+                <h2 class="text-xl font-semibold mb-4">Study Plan Generator</h2>
+                <form id="study-plan-form" class="flex flex-col gap-4">
+                    <input
+                        id="subject"
+                        type="text"
+                        placeholder="Subject"
+                        class="w-full p-2 border rounded-md"
+                    />
+                    <input
+                        id="time"
+                        type="number"
+                        placeholder="Available Time (in hours)"
+                        class="w-full p-2 border rounded-md"
+                    />
+                    <button
+                        type="submit"
+                        class="bg-green-500 text-white px-4 py-2 rounded-md"
+                    >
+                        Generate Plan
+                    </button>
+                </form>
+                <div id="study-plan-output" class="mt-4 text-gray-700"></div>
+            </section>
+            <!-- Productivity Music -->
+            <section class="bg-white p-6 shadow-md rounded-2xl">
+                <h2 class="text-xl font-semibold mb-4">Productivity Music</h2>
+                <iframe
+                    class="w-full h-36 rounded-md"
+                    src="https://open.spotify.com/embed/playlist/37i9dQZF1DX3Ogo9pFvBkY"
+                    frameborder="0"
+                    allowtransparency="true"
+                    allow="encrypted-media"
+                ></iframe>
+            </section>
+        </main>
+        <!-- Footer -->
+        <footer class="w-full bg-gray-800 p-4 text-white text-center mt-6">
+            Share your progress with friends!
+        </footer>
+        <!-- JavaScript -->
+        <script>
+            // Pomodoro Timer Logic
+            let timerInterval, timeLeft = 1500; // Default 25 minutes
+            const timerDisplay = document.getElementById("timer");
+
+            function updateTimer() {
+                const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                const seconds = String(timeLeft % 60).padStart(2, '0');
+                timerDisplay.textContent = `${minutes}:${seconds}`;
+            }
+
+            document.getElementById("start").addEventListener("click", () => {
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) timeLeft--;
+                    else clearInterval(timerInterval);
+                    updateTimer();
+                }, 1000);
+            });
+
+            document.getElementById("pause").addEventListener("click", () => clearInterval(timerInterval));
+            document.getElementById("reset").addEventListener("click", () => {
+                clearInterval(timerInterval);
+                timeLeft = 1500;
+                updateTimer();
+            });
+
+            // Task Tracker Logic
+            const taskInput = document.getElementById("task-input");
+            const taskList = document.getElementById("task-list");
+            const pointsDisplay = document.getElementById("points");
+            let points = 0;
+
+            document.getElementById("add-task").addEventListener("click", () => {
+                const task = taskInput.value.trim();
+                if (task) {
+                    const li = document.createElement("li");
+                    li.textContent = task;
+                    li.addEventListener("click", () => {
+                        li.remove();
+                        points++;
+                        pointsDisplay.textContent = `Points: ${points}`;
+                    });
+                    taskList.appendChild(li);
+                    taskInput.value = "";
+                }
+            });
+
+            // Study Plan Generator Logic
+            document.getElementById("study-plan-form").addEventListener("submit", (e) => {
+                e.preventDefault();
+                const subject = document.getElementById("subject").value.trim();
+                const time = document.getElementById("time").value;
+                const output = document.getElementById("study-plan-output");
+                if (subject && time) {
+                    output.innerHTML = `Plan for <b>${subject}</b>: Study for ${time} hours. Break into focused sessions.`;
+                } else {
+                    output.textContent = "Please provide subject and time.";
+                }
+            });
+        </script>
+    </body>
+</html>
